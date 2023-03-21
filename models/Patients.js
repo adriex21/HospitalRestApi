@@ -10,6 +10,7 @@ const patient = new Schema({
     phone: {type:String, required:true},
     doctor:{type:mongoose.Schema.Types.ObjectId, ref:'Employee'},
     assistans: [{type:mongoose.Schema.Types.ObjectId, ref:'Employee'}],
+    treatments:[{type:mongoose.Schema.Types.ObjectId, ref:'Treatments'}]
 })  
 
 

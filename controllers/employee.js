@@ -148,8 +148,7 @@ const controller = {
                   updatedEmployeeData,
                   { new: true } // This option returns the updated doctor instead of the old one
                 );
-                console.log(employeeId);
-                console.log(employee);
+               
                 
                 if (!employee) {
                   return res.status(404).json({ message: 'Employee not found.' });
@@ -243,16 +242,62 @@ const controller = {
                             doctor
                         });
 
-                        newPatient.save().then(employee=>{
+                        newPatient.save().then(patient=>{
                             res.send({msg:'Patient was created'});
                         }).catch(err=>console.log(err))
+
+                        doctor.patients.push(newPatient._id);
+                        doctor.save();
     
                     }
                 })
+
+                
             }
         },
 
         updatePatient : async(req, res) => {
+
+            const drOrManager = await Employee.findById(req.employee._id);
+            const doctor = await Patient.findOne({doctor: req.employee._id}); //search for the patient whose doctor is the one making the request
+            const patient = await Patient.findById(req.params.id) //search for the patient we making the request for
+
+            console.log("*******")
+            console.log(doctor) 
+            console.log(patient)
+
+            if (!['General Manager', 'Doctor'].includes(drOrManager?.role)) {
+                return res.status(200).send({msg : "You are not a general manager or patient's doctor"});
+            }
+
+            if(!doctor._id.equals(patient._id)) {
+                return res.status(200).send({msg:"You are not the patient's doctor"});  //we verify if the doctor making the request is the same doctor that manages the patient
+            }
+
+
+            try {
+                const patientId = req.params.id;
+                const updatedPatientData = req.body;
+                
+                const patient = await Patient.findOneAndUpdate(
+                  {_id: patientId}, 
+                  updatedPatientData,
+                  { new: true } // This option returns the updated patient instead of the old one
+                );
+                
+                
+                if (!patient) {
+                  return res.status(404).json({ message: 'Patient not found.' });
+                }
+                else {
+                  return res.status(200).json({ message: 'Patient updated' });
+                }
+            
+              
+              } catch (err) {
+                console.error(err);
+                res.status(500).json({ message: 'Server error.' });
+        }
 
         },
 
