@@ -1,4 +1,5 @@
 const Employee = require('../models/Employee');
+const Patient = require('../models/Patients')
 const jwt = require('jsonwebtoken')
 const passport = require('passport');
 const moment = require('moment')
@@ -68,11 +69,9 @@ const controller = {
 
 
     login: async (req, res) => {
-        console.log(req.body)
         try {
             let employee = await Employee.findOne({email: req.body.email } )
             let valid = await bcrypt.compare(req.body.password, employee.password);
-            console.log(employee._id)
 
             if (valid) {
                 const expires = moment().add(10, 'days');
@@ -136,7 +135,7 @@ const controller = {
                 return res.status(200).send({msg : 'You are not a general manager'});
             }
 
-            if(req.body.specialty) {
+            if(req.body.role) {
                 return res.status(200).send({msg : 'You cannot modify the role'});
             }
 
@@ -201,6 +200,90 @@ const controller = {
                 res.status(500).send({ message: 'Internal server error' });
             }
         },
+
+
+        createPatient : async(req, res) => {
+
+            const {name,gender,birthDate,adress,phone,doctorId } = req.body;
+            const drOrManager = await Employee.findById(req.employee._id);
+            const doctor = await Employee.findById(doctorId);
+
+            let errors  = [];
+
+            if(!name|| !gender || !birthDate || !adress || !phone || !doctorId) {
+                errors.push({msg: "Please fill all the fields"});
+            }
+
+            if(phone.length !== 10) {
+                errors.push({msg: "Invalid phone number"});
+            }
+
+            if(doctor.role !== 'Doctor') {
+                errors.push({msg: "Doctor doesn't exist"});
+            }
+
+            if(!['Doctor', 'General Manager'].includes(drOrManager?.role)) {
+                errors.push({msg : 'You are not a general manager or a doctor'});
+            }
+
+            if(errors.length > 0) {
+                res.send(errors)
+            } else {
+                Patient.findOne({phone:phone}).then(patient => {
+                    if(patient) {
+                        errors.push({msg: 'Phone number already used'});
+                        res.send({msg:'Patient already exists'});
+                    } else {
+                        const newPatient = new Patient({
+                            name,
+                            gender,
+                            birthDate,
+                            adress,
+                            phone,
+                            doctor
+                        });
+
+                        newPatient.save().then(employee=>{
+                            res.send({msg:'Patient was created'});
+                        }).catch(err=>console.log(err))
+    
+                    }
+                })
+            }
+        },
+
+        updatePatient : async(req, res) => {
+
+        },
+
+        assignAssistant: async(req,res) => {
+
+        },
+
+        createTreatment: async (req, res) => {
+
+        },
+
+        editTreatment: async(req,res) => {
+
+        },
+
+        assignTreatment: async(req,res) => {
+
+        },
+
+        getDoctorsReport: async(req,res) => {
+
+        },
+
+        getTreatmentsReport : async(req,res) => {
+            
+
+        },
+
+
+
+
 
         
     

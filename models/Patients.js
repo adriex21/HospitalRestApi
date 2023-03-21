@@ -8,6 +8,9 @@ const patient = new Schema({
     birthDate: {type: Date, required:true},
     adress: {type:String, required: true},
     phone: {type:String, required:true},
-    doctor:{type:mongoose.Schema.Types.ObjectId, ref:'Doctor'},
-    assistans: [{type:mongoose.Schema.Types.ObjectId, ref:'Assistans'}],
-})
+    doctor:{type:mongoose.Schema.Types.ObjectId, ref:'Employee'},
+    assistans: [{type:mongoose.Schema.Types.ObjectId, ref:'Employee'}],
+})  
+
+
+module.exports = mongoose.model("Patients", patient);

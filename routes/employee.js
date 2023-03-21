@@ -11,6 +11,8 @@ router.post('/login', employee.login);
 router.post('/createDoctor', auth(), employee.createDoctor);
 router.put('/updateEmployee/:id', auth(), employee.updateEmployee);
 router.post('/createAssistant', auth(), employee.createAssistant);
+router.post('/createPatient' , auth(), employee.createPatient);
+
 
 
 
