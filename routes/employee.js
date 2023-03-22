@@ -13,6 +13,12 @@ router.put('/updateEmployee/:id', auth(), employee.updateEmployee);
 router.post('/createAssistant', auth(), employee.createAssistant);
 router.post('/createPatient' , auth(), employee.createPatient);
 router.put('/updatePatient/:id', auth(), employee.updatePatient);
+router.put('/assignAssistant/:id', auth(), employee.assignAssistant);
+router.post('/createTreatment', auth(), employee.createTreatment);
+router.put('/editTreatment/:id', auth(), employee.editTreatment);
+router.put('/recommendTreatment/:id', auth(), employee.recommendTreatment);
+router.put('/applyTreatment/:id', auth(), employee.applyTreatment);
+
 
 
 

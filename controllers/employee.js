@@ -1,5 +1,6 @@
 const Employee = require('../models/Employee');
-const Patient = require('../models/Patients')
+const Patient = require('../models/Patients');
+const Treatment = require('../models/Treatments')
 const jwt = require('jsonwebtoken')
 const passport = require('passport');
 const moment = require('moment')
@@ -262,17 +263,13 @@ const controller = {
             const doctor = await Patient.findOne({doctor: req.employee._id}); //search for the patient whose doctor is the one making the request
             const patient = await Patient.findById(req.params.id) //search for the patient we making the request for
 
-            console.log("*******")
-            console.log(doctor) 
-            console.log(patient)
-
-            if (!['General Manager', 'Doctor'].includes(drOrManager?.role)) {
+            if (!['General Manager', 'Doctor'].includes(drOrManager?.role) && !doctor._id.equals(patient._id)) {
                 return res.status(200).send({msg : "You are not a general manager or patient's doctor"});
             }
 
-            if(!doctor._id.equals(patient._id)) {
-                return res.status(200).send({msg:"You are not the patient's doctor"});  //we verify if the doctor making the request is the same doctor that manages the patient
-            }
+            // if(!doctor._id.equals(patient._id)) {
+            //     return res.status(200).send({msg:"You are not the patient's doctor"});  //we verify if the doctor making the request is the same doctor that manages the patient
+            // }
 
 
             try {
@@ -303,19 +300,224 @@ const controller = {
 
         assignAssistant: async(req,res) => {
 
+            const drOrManager = await Employee.findById(req.employee._id);
+            const patient = await Patient.findById(req.params.id) 
+
+            if (!['General Manager', 'Doctor'].includes(drOrManager?.role) && !patient.doctor.equals(req.employee._id)) {
+                return res.status(200).send({msg : "You are not a general manager or patient's doctor"});
+            }
+
+            // if(!patient.doctor.equals(req.employee._id)) {
+            //     return res.status(200).send({msg:"You are not the patient's doctor"});  
+            // }
+
+            
+
+
+            try {
+                const patientId = req.params.id;          
+                const assistant = await Employee.findById(req.body.assistants);
+                const patient = await Patient.findById(patientId);
+
+                if(!assistant){
+                    return res.status(404).json({ message: 'Assistant not found.' });
+                }
+                if(patient.assistants.includes(req.body.assistants)) {
+                    return res.status(404).json({ message: 'Assistant already assigned' });
+                }
+                
+                patient.assistants.push(req.body.assistants);
+                patient.save();
+                assistant.patients.push(patient._id);
+                assistant.save();
+
+
+                if (!patient) {
+                  return res.status(404).json({ message: 'Patient not found.' });
+                }
+                else {
+                  return res.status(200).json({ message: 'Assistant assigned' });
+                }
+
+              
+              } catch (err) {
+                console.error(err);
+                res.status(500).json({ message: 'Server error.' });
+        }
+
+
         },
 
         createTreatment: async (req, res) => {
 
-        },
+            const {name,description,medication} = req.body;
+            const drOrManager = await Employee.findById(req.employee._id);
+
+            let errors  = [];
+
+            if(!name|| !description || !medication) {
+                errors.push({msg: "Please fill all the fields"});
+            }
+
+            if(!['Doctor', 'General Manager'].includes(drOrManager?.role)) {
+                errors.push({msg : 'You are not a general manager or a doctor'});
+            }
+
+            if(errors.length > 0) {
+                res.send(errors)
+            } else {
+                        const newTreatment = new Treatment({
+                            name,
+                            description,
+                            medication
+
+                        });
+
+                        newTreatment.save().then(treatment=>{
+                            res.send({msg:'Treatment was created'});
+                        }).catch(err=>console.log(err))
+
+                    }
+                  
+            },
+
+
 
         editTreatment: async(req,res) => {
 
+            
+            const drOrManager = await Employee.findById(req.employee._id);
+
+            if(!['Doctor', 'General Manager'].includes(drOrManager?.role)) {
+                res.status(200).send({msg : 'You are not a general manager or a doctor'});
+            }
+
+            try {
+                    const updatedTreatmentData = req.body;
+                    const treatmentId = req.params.id;
+                    
+                        const treatment = await Treatment.findOneAndUpdate(
+                            {_id : treatmentId },
+                            updatedTreatmentData,
+                            {new: true}
+                            );
+
+                            if(!treatment) {
+                                res.status(404).send({msg: "Treatment doesn't exist"})
+                            }
+
+                            else {
+                                res.status(200).send({msg: "Treatment updated"})
+                            }
+
+                    } catch(err) {
+                        console.log(err);
+                        res.status(500).send({msg: "Interval server error"})
+                    }
+                  
+
+
         },
 
-        assignTreatment: async(req,res) => {
+        recommendTreatment: async(req,res) => {
+            const drOrManager = await Employee.findById(req.employee._id);
+            const patient = await Patient.findById(req.params.id) 
+
+            if (!['General Manager', 'Doctor'].includes(drOrManager?.role) && !patient.doctor.equals(req.employee._id)) {
+                return res.status(200).send({msg : "You are not a general manager or patient's doctor"});
+            }
+
+            // if(!patient.doctor.equals(req.employee._id)) {
+            //     return res.status(200).send({msg:"You are not the patient's doctor"});  
+            // }
+
+
+            try {
+                const patientId = req.params.id;          
+                const treatmentId = await Treatment.findById(req.body.treatmentsRecommended);
+                const patient = await Patient.findById(patientId);
+
+                console.log()
+
+                if(!treatmentId){
+                    return res.status(404).json({ message: 'Treatment not found.' });
+                }
+                if(patient.treatmentsRecommended.some(obj => obj.id === req.body.treatmentsRecommended)) {
+                    return res.status(404).json({ message: 'Treatment already assigned' });
+                }
+                
+                const treatment = {id: req.body.treatmentsRecommended, applied:false, appliedBy:'None'};
+                patient.treatmentsRecommended.push(treatment);
+                patient.save();
+            
+
+                if (!patient) {
+                  return res.status(404).json({ message: 'Patient not found.' });
+                }
+                else {
+                  return res.status(200).json({ message: 'Treatment assigned' });
+                }
+
+              
+              } catch (err) {
+                console.error(err);
+                res.status(500).json({ message: 'Server error.' });
+        }
+            
+        },
+        
+        applyTreatment: async(req,res) => {
+
+            const asssistant = await Employee.findById(req.employee._id);
+            const patient = await Patient.findById(req.params.id)
+
+
+            if (!['Assistant'].includes(asssistant?.role)) {
+                return res.status(200).send({msg : "You are not an assistant"});
+            }
+
+            if(!patient.assistants.includes(req.employee._id)) {
+                return res.status(200).send({msg:"You are not the patient's assistant"});  
+            }
+
+
+            try {
+                const patientId = req.params.id;          
+                const treatment = await Treatment.findById(req.body.treatmentsRecommended);
+                const patient = await Patient.findById(patientId);
+
+                if(!treatment){
+                    return res.status(404).json({ message: 'Treatment not found.' });
+                }
+                if(patient.treatmentsRecommended.some(obj => obj.id === req.body.treatmentsRecommended)) {
+                    const patient = await Patient.findOneAndUpdate(
+                        {_id: patientId, "treatmentsRecommended.id" : req.body.treatmentsRecommended },
+                        {$set : {"treatmentsRecommended.$[elem].applied" : true, "treatmentsRecommended.$[elem].applied":true,
+                         "treatmentsRecommended.$[elem].appliedBy" :req.employee._id, "treatmentsRecommended.$[elem].date":new Date() }},
+                         {arrayFilters: [{"elem.id": req.body.treatmentsRecommended}], new: true}
+                        );
+
+                    
+                } else {
+                    return res.status(404).json({ message: 'Treatment not found.' });
+                }
+                
+
+                if (!patient) {
+                  return res.status(404).json({ message: 'Patient not found.' });
+                }
+                else {
+                  return res.status(200).json({ message: 'Treatment applied' });
+                }
+
+              
+              } catch (err) {
+                console.error(err);
+                res.status(500).json({ message: 'Server error.' });
+        }
 
         },
+
 
         getDoctorsReport: async(req,res) => {
 

@@ -9,8 +9,9 @@ const patient = new Schema({
     adress: {type:String, required: true},
     phone: {type:String, required:true},
     doctor:{type:mongoose.Schema.Types.ObjectId, ref:'Employee'},
-    assistans: [{type:mongoose.Schema.Types.ObjectId, ref:'Employee'}],
-    treatments:[{type:mongoose.Schema.Types.ObjectId, ref:'Treatments'}]
+    assistants: [{type:mongoose.Schema.Types.ObjectId, ref:'Employee'}],
+    treatmentsRecommended:[{type:mongoose.Schema.Types.Mixed, ref:'Treatments'}]
+
 })  
 
 
