@@ -420,17 +420,12 @@ const controller = {
         },
 
         recommendTreatment: async(req,res) => {
-            const drOrManager = await Employee.findById(req.employee._id);
+            const doctor = await Employee.findById(req.employee._id);
             const patient = await Patient.findById(req.params.id) 
 
-            if (!['General Manager', 'Doctor'].includes(drOrManager?.role) && !patient.doctor.equals(req.employee._id)) {
-                return res.status(200).send({msg : "You are not a general manager or patient's doctor"});
+            if (!['Doctor'].includes(doctor?.role) && !patient.doctor.equals(req.employee._id)) {
+                return res.status(200).send({msg : "You are not the patient's doctor"});
             }
-
-            // if(!patient.doctor.equals(req.employee._id)) {
-            //     return res.status(200).send({msg:"You are not the patient's doctor"});  
-            // }
-
 
             try {
                 const patientId = req.params.id;          
@@ -446,7 +441,7 @@ const controller = {
                     return res.status(404).json({ message: 'Treatment already assigned' });
                 }
                 
-                const treatment = {id: req.body.treatmentsRecommended, applied:false, appliedBy:'None'};
+                const treatment = {id: req.body.treatmentsRecommended, applied:false, appliedBy:'None', recommendedBy : req.employee._id};
                 patient.treatmentsRecommended.push(treatment);
                 patient.save();
             
@@ -489,11 +484,12 @@ const controller = {
                 if(!treatment){
                     return res.status(404).json({ message: 'Treatment not found.' });
                 }
+
                 if(patient.treatmentsRecommended.some(obj => obj.id === req.body.treatmentsRecommended)) {
                     const patient = await Patient.findOneAndUpdate(
                         {_id: patientId, "treatmentsRecommended.id" : req.body.treatmentsRecommended },
                         {$set : {"treatmentsRecommended.$[elem].applied" : true, "treatmentsRecommended.$[elem].applied":true,
-                         "treatmentsRecommended.$[elem].appliedBy" :req.employee._id, "treatmentsRecommended.$[elem].date":new Date() }},
+                         "treatmentsRecommended.$[elem].appliedBy" :req.employee._id, "treatmentsRecommended.$[elem].dateApplied":new Date() }},
                          {arrayFilters: [{"elem.id": req.body.treatmentsRecommended}], new: true}
                         );
 
@@ -521,20 +517,64 @@ const controller = {
 
         getDoctorsReport: async(req,res) => {
 
+            const manager = await Employee.findById(req.employee._id);
+
+            if (!['General Manager'].includes(manager?.role)) {
+                return res.status(200).send({msg : "You are not a general manager"});
+            }
+
+            try {
+                const doctors = await Employee.find({role: "Doctor"}).populate({path: 'patients', select: 'name gender adress phone'}).select('name email specialty patients');
+
+                const patientCountByDoctor = await Employee.aggregate([
+                    { $match: { role: 'Doctor' } },
+                    { $lookup: { from: 'patients', localField: 'patients', foreignField: '_id', as: 'patients' } },
+                    { $lookup: { from: "employees", localField: "_id", foreignField: "_id",as: "doctor"}},
+                    { $project: { _id: "$_id",  name: { $arrayElemAt: ["$doctor.name", 0] }, patientCount: { $size: '$patients' }} },
+                    { $group: { _id: '$_id', name: { $first: "$name" }, patientCount: { $sum: '$patientCount' }} }
+                  ]);
+
+    
+                const stats = {patientCountByDoctor};  
+                const report = {
+                  doctors,
+                  stats,
+                };
+                res.json(report);
+              } catch (err) {
+                console.error(err);
+                res.status(500).json({ message: 'Server error.' });
+              }
         },
 
         getTreatmentsReport : async(req,res) => {
-            
+
+            const drOrManager = await Employee.findById(req.employee._id);
+
+            if (!['General Manager', 'doctor'].includes(drOrManager?.role)) {
+                return res.status(200).send({msg : "You are not a general manager or a doctor"});
+            }
+
+            try {
+
+                const patientId = req.params.id;
+                const patient = await Patient.findById(patientId);
+
+                const appliedTreatments = patient.treatmentsRecommended.filter(treatment => treatment.applied === true);
+
+                res.json(appliedTreatments);
+
+            } catch(err) {
+                console.error(err);
+                res.status(500).json({ message: 'Server error.' });
+            }
+
 
         },
 
-
-
-
-
         
-    
-    
+
+
     }
     
     

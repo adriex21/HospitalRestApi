@@ -18,8 +18,8 @@ router.post('/createTreatment', auth(), employee.createTreatment);
 router.put('/editTreatment/:id', auth(), employee.editTreatment);
 router.put('/recommendTreatment/:id', auth(), employee.recommendTreatment);
 router.put('/applyTreatment/:id', auth(), employee.applyTreatment);
-
-
+router.get('/getDoctorsReport', auth(), employee. getDoctorsReport);
+router.get('/getTreatmentsReport/:id', auth(), employee.getTreatmentsReport);   
 
 
 
