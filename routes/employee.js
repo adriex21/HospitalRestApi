@@ -20,7 +20,9 @@ router.put('/recommendTreatment/:id', auth(), employee.recommendTreatment);
 router.put('/applyTreatment/:id', auth(), employee.applyTreatment);
 router.get('/getDoctorsReport', auth(), employee. getDoctorsReport);
 router.get('/getTreatmentsReport/:id', auth(), employee.getTreatmentsReport);   
-
-
+router.get('/getDoctor/:id', auth(), employee.getDoctor);
+router.delete('/deleteDoctor/:id', auth(), employee.deleteDoctor);
+router.get('/getPatient/:id' , auth(), employee.getPatient);
+router.delete('/deletePatient/:id' , auth(), employee.deletePatient);
 
 module.exports = router;

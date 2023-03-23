@@ -551,7 +551,7 @@ const controller = {
 
             const drOrManager = await Employee.findById(req.employee._id);
 
-            if (!['General Manager', 'doctor'].includes(drOrManager?.role)) {
+            if (!['General Manager', 'Doctor'].includes(drOrManager?.role)) {
                 return res.status(200).send({msg : "You are not a general manager or a doctor"});
             }
 
@@ -572,7 +572,126 @@ const controller = {
 
         },
 
-        
+        getDoctor: async (req,res) => {
+
+            const doctor = await Employee.findById(req.params.id);
+            const manager = await Employee.findById(req.employee._id);
+
+            if(manager.role !== 'General Manager') {
+                res.status(404).send({msg: "You are not a general manager"});
+            }
+
+              try{
+
+                if(!doctor) {
+                    res.status(404).send({msg: "Doctor doesn't exist"});
+                }
+
+                if(doctor.role !== 'Doctor') {
+                    res.status(404).send({msg: "Not a doctor"});
+                } 
+                else{
+                    return res.status(200).send(doctor)
+                }
+
+
+
+              } catch(err) {
+                 res.status(500).send({msg: "Interal error"})
+              }
+            
+        },
+
+        deleteDoctor: async (req,res) => {
+
+            const doctor = await Employee.findById(req.params.id);
+            const manager = await Employee.findById(req.employee._id);
+            
+            if(manager.role !== 'General Manager') {
+                res.status(404).send({msg: "You are not a general manager"});
+            }
+
+            if(!doctor || doctor.role !== 'Doctor') {
+                res.status(404).send({msg: "Doctor doesn't exist"});
+            }
+
+            try {
+
+                if(doctor) {
+                    await Employee.findOneAndDelete({_id: req.params.id});
+                    res.status(200).send({msg: "Doctor deleted"})
+                }
+                  
+                  if (!patient) {
+                    return res.status(404).json({ message: 'Patient not found.' });
+                  }
+
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({msg: "Internal error"})
+            }
+
+
+        },
+
+        getPatient: async(req,res) => {
+            const patient = await Patient.findById(req.params.id);
+            const manager = await Employee.findById(req.employee._id);
+
+            if(manager.role !== 'General Manager') {
+                res.status(404).send({msg: "You are not a general manager"});
+            }
+
+              try{
+
+                if(!patient) {
+                    res.status(404).send({msg: "Patient doesn't exist"});
+                }
+
+                else{
+                    return res.status(200).send(patient)
+                }
+
+              } catch(err) {
+                 res.status(500).send({msg: "Interal error"})
+              }
+            
+        },
+
+        deletePatient: async(req,res) => {
+
+            const patient = await Patient.findById(req.params.id);
+            const drOrManager = await Employee.findById(req.employee._id);
+            
+            if (!['General Manager', 'Doctor'].includes(drOrManager?.role)) {
+                return res.status(200).send({msg : "You are not a general manager or a doctor"});
+            }
+
+            try {
+
+                if(patient) {
+                    await Patient.findOneAndDelete({_id: req.params.id});
+                    const employee = await Employee.find({patients:{$all: [req.params.id]}});
+
+                      employee.forEach(async (employee) => {
+                        const index = employee.patients.indexOf(req.params.id);
+                        employee.patients.splice(index, 1);
+                        await employee.save();
+                      });
+
+                      res.status(200).send({msg: "Patient deleted"});
+                }
+                else {
+                    return res.status(404).json({ message: 'Patient not found.' });
+                  }
+
+
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({msg: "Internal error"})
+            }
+
+        }
 
 
     }
