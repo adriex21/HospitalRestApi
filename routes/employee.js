@@ -3,8 +3,6 @@ const router = express.Router();
 const employee = require('../controllers/employee')
 const auth = require('../middlewares/auth')
 
-// const passport = require('passport')
-// const auth = require('../middlewares/auth')
 
 router.post('/register', employee.register);
 router.post('/login', employee.login);
@@ -24,5 +22,10 @@ router.get('/getDoctor/:id', auth(), employee.getDoctor);
 router.delete('/deleteDoctor/:id', auth(), employee.deleteDoctor);
 router.get('/getPatient/:id' , auth(), employee.getPatient);
 router.delete('/deletePatient/:id' , auth(), employee.deletePatient);
+router.get('/getAssistant/:id', auth(), employee.getAssistant);
+router.delete('/deleteAssistant/:id', auth(), employee.deleteAssistant);
+router.get('/getTreatment/:id',auth(), employee.getTreatment);
+router.delete('/deleteTreatment/:id', auth(), employee.deleteTreatment);
+
 
 module.exports = router;

@@ -486,7 +486,7 @@ const controller = {
                 }
 
                 if(patient.treatmentsRecommended.some(obj => obj.id === req.body.treatmentsRecommended)) {
-                    const patient = await Patient.findOneAndUpdate(
+                    await Patient.findOneAndUpdate(
                         {_id: patientId, "treatmentsRecommended.id" : req.body.treatmentsRecommended },
                         {$set : {"treatmentsRecommended.$[elem].applied" : true, "treatmentsRecommended.$[elem].applied":true,
                          "treatmentsRecommended.$[elem].appliedBy" :req.employee._id, "treatmentsRecommended.$[elem].dateApplied":new Date() }},
@@ -619,12 +619,14 @@ const controller = {
 
                 if(doctor) {
                     await Employee.findOneAndDelete({_id: req.params.id});
+                    await Patient.updateMany(
+                        { doctor: req.params.id },
+                        { $set: { doctor: null } }
+                      );
+                      
                     res.status(200).send({msg: "Doctor deleted"})
                 }
                   
-                  if (!patient) {
-                    return res.status(404).json({ message: 'Patient not found.' });
-                  }
 
             } catch (err) {
                 console.log(err);
@@ -638,7 +640,7 @@ const controller = {
             const patient = await Patient.findById(req.params.id);
             const manager = await Employee.findById(req.employee._id);
 
-            if(manager.role !== 'General Manager') {
+            if (!['General Manager', 'Doctor'].includes(drOrManager?.role)) {
                 res.status(404).send({msg: "You are not a general manager"});
             }
 
@@ -671,13 +673,10 @@ const controller = {
 
                 if(patient) {
                     await Patient.findOneAndDelete({_id: req.params.id});
-                    const employee = await Employee.find({patients:{$all: [req.params.id]}});
-
-                      employee.forEach(async (employee) => {
-                        const index = employee.patients.indexOf(req.params.id);
-                        employee.patients.splice(index, 1);
-                        await employee.save();
-                      });
+                    await Employee.updateMany(
+                        { patients: req.params.id },
+                        { $pull: { patients: req.params.id } }
+                      );
 
                       res.status(200).send({msg: "Patient deleted"});
                 }
@@ -691,10 +690,130 @@ const controller = {
                 res.status(500).json({msg: "Internal error"})
             }
 
-        }
+        },
+
+        getAssistant: async (req,res) => {
+
+            const assistant = await Employee.findById(req.params.id);
+            const manager = await Employee.findById(req.employee._id);
+
+            if(manager.role !== 'General Manager') {
+                res.status(404).send({msg: "You are not a general manager"});
+            }
+
+              try{
+
+                if(!assistant) {
+                    res.status(404).send({msg: "Assistant doesn't exist"});
+                }
+
+                if(assistant.role !== 'Assistant') {
+                    res.status(404).send({msg: "Not an assistant"});
+                } 
+                else{
+                    return res.status(200).send(assistant)
+                }
 
 
-    }
+
+              } catch(err) {
+                 res.status(500).send({msg: "Interal error"})
+              }
+            
+            
+        },
+
+        deleteAssistant: async(req,res) => {
+
+            const assistant = await Employee.findById(req.params.id);
+            const drOrManager = await Employee.findById(req.employee._id);
+            
+            if (!['General Manager'].includes(drOrManager?.role)) {
+                return res.status(200).send({msg : "You are not a general manager"});
+            }
+
+            try {
+
+                if(assistant) {
+                    await Employee.findOneAndDelete({_id: req.params.id});
+            
+                      await Patient.updateMany(
+                        { "assistants": req.params.id },
+                        { $pull: { assistants: req.params.id } }
+);
+
+                      res.status(200).send({msg: "Assistant deleted"});
+                }
+                else {
+                    return res.status(404).json({ message: 'Assistant not found.' });
+                  }
+
+
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({msg: "Internal error"})
+            }
+
+
+    },
+
+    getTreatment: async (req,res) => {
+            const treatment = await Treatment.findById(req.params.id);
+            const drOrManager = await Employee.findById(req.employee._id);
+
+            if(!['General Manager', 'Doctor'].includes(drOrManager?.role)) {
+                res.status(404).send({msg: "You are not a general manager"});
+            }
+
+              try{
+
+                if(!treatment) {
+                    res.status(404).send({msg: "Treatment doesn't exist"});
+                }
+
+                else{
+                    return res.status(200).send(treatment)
+                }
+
+              } catch(err) {
+                 res.status(500).send({msg: "Interal error"})
+              }
+    },
+
+    deleteTreatment: async(req,res) => {
+            const treatment = await Treatment.findById(req.params.id);
+            const drOrManager = await Employee.findById(req.employee._id);
+            
+            if (!['General Manager', 'Doctor'].includes(drOrManager?.role)) {
+                return res.status(200).send({msg : "You are not a general manager or a doctor"});
+            }
+
+            try {
+
+                if(treatment) {
+                    await Treatment.findOneAndDelete({_id: req.params.id});
+                    await Patient.updateMany(
+                    { "treatmentsRecommended.id": req.params.id },
+                    { $pull: { treatmentsRecommended: { id: req.params.id } } }
+                    );
+                    
+
+                      res.status(200).send({msg: "Treatment deleted"});
+                }
+                else {
+                    return res.status(404).json({ message: 'Treatment not found.' });
+                  }
+
+
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({msg: "Internal error"})
+            }
+    },
+
+
+
+}
     
     
 
