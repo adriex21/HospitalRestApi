@@ -276,10 +276,10 @@ const controller = {
 
         getPatient: async(req,res) => {
             const patient = await Patient.findById(req.params.id);
-            const manager = await Employee.findById(req.employee._id);
+            const drOrManager = await Employee.findById(req.employee._id);
 
             if (!['General Manager', 'Doctor'].includes(drOrManager?.role)) {
-                res.status(404).send({msg: "You are not a general manager"});
+                res.status(404).send({msg: "You are not a general manager or patient's doctor"});
             }
 
               try{
