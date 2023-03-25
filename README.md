@@ -1,6 +1,6 @@
 # TremendHomework
 
-In order to install the necessary dependencies , they could all be installed at once using npm i 
+In order to install the necessary dependencies , they could be installed together by running the command npm i 
 
 Dependencies used :axios, bcrypt, bcryptjs, body-parser, chai, cors, dotenv, express, http-status, jest, jsonwebtoken, mockingoose, moment, mongoose, nodemon, passport, passport-jwt, supertest
 
