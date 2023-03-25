@@ -6,19 +6,14 @@ Dependencies used :axios, bcrypt, bcryptjs, body-parser, chai, cors, dotenv, exp
 
 In order to run the application, use the command : npm run dev
 
-The endpoints an user should begin with are : /api/employee/register, /api/employee/login in order to create an account and login, the default role will be "None"
+The recommended endpoints for users to begin with are '/api/employee/register' and '/api/employee/login' to create an account and log in, with the default role being "None". It is assumed that a manager is already registered in the database, and the role cannot be assigned during registration to prevent anyone from becoming a manager. Instead, the role can be changed from "None" to "General Manager" in the database.
 
-We assume we have a manager already registered in the database, we cannot asign the role when we register because everyone could become a manager. (From the database we change the role from "None" to "General Manager"
+As a manager, I need to assign the roles of doctors and assistants to employees using '/api/manager/createDoctor' and '/api/manager/createAssistant', respectively. To do this, the employee's ID is provided in the body.
 
-In order to become a doctor or an assistant, as a manager I need to assign those roles to the employee using : /api/manager/createDoctor - for this we provide in the body the id of the employee that will become a doctor,  /api/manager/createAssistant - the same as previous
+As a doctor, I have access to various endpoints such as '/api/doctor/createPatient' to create a patient, '/api/doctor/updatePatient/:id' to update a patient, '/api/doctor/assignAssistant/:id' to assign an assistant to a patient, '/api/doctor/createTreatment' to create a treatment, '/api/doctor/editTreatment/:id' to edit a treatment, and '/api/doctor/recommendTreatment/:id' to recommend a treatment to a patient. Additionally, a treatments report can be generated to view all treatments applied to a patient using '/api/doctor/getTreatmentsReport/:id'. Other endpoints for getting and deleting patients and treatments are also available.
 
-As a doctor  I can - : /api/doctor/createPatient,  /api/doctor/updatePatient/:id by providing the patient id in the url, /api/doctor/assignAssistant/:id, to asssign an assistant or more, to create a treatment /api/doctor/createTreatment, to edit the treatment /api/doctor/editTreatment/:id and recommend the treatment to a patient /api/doctor/recommendTreatment/:id, the id in the url is the patient we want to recommend
-the treatment to and the treatment id is provided in the body, and also to get a treatments report where I can see all the treatments applied to a patient /api/doctor/getTreatmentsReport/:id
-. Besides those endpoints we have some endpoints for get and delete the patients and treatments.
+As an assistant, I am limited to the endpoint '/api/assistant/applyTreatment/:id' to apply treatments to a patient, where the patient's ID is provided in the URL.
 
-As an assistant I can only apply the treatment to a patient : /api/assistant/applyTreatment/:id , the url id is the patient we want to apply a treatment for
-
-As a manager I can update the employees ( doctors and assistants ) : /api/manager/updateEmployee/:id, I can get a report with all the doctors and a statistics /api/manager/getDoctorsReport, 
-and get and deletes for doctors and assistants.
+As a manager, I can update the employees, including doctors and assistants, using '/api/manager/updateEmployee/:id'. Additionally, I can obtain a report of all the doctors and their statistics using '/api/manager/getDoctorsReport'. Endpoints for getting and deleting doctors and assistants are also available.
 
         
