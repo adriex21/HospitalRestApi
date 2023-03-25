@@ -14,6 +14,6 @@ As a doctor, I have access to various endpoints such as '/api/doctor/createPatie
 
 As an assistant, I am limited to the endpoint '/api/assistant/applyTreatment/:id' to apply treatments to a patient, where the patient's ID is provided in the URL.
 
-As a manager, I can update the employees, including doctors and assistants, using '/api/manager/updateEmployee/:id'. Additionally, I can obtain a report of all the doctors and their statistics using '/api/manager/getDoctorsReport'. Endpoints for getting and deleting doctors and assistants are also available.
+As a manager, I have access to the endpoints used by doctor except recommending treatments and I can update the employees, including doctors and assistants, using '/api/manager/updateEmployee/:id'. Additionally, I can obtain a report of all the doctors and their statistics using '/api/manager/getDoctorsReport'. Endpoints for getting and deleting doctors and assistants are also available.
 
         
