@@ -1,0 +1,56 @@
+{
+    "request_data_create_patient": {
+        "name":"George",
+        "gender":"Male",
+        "birthDate":"5/5/2001",
+        "adress":"alea livezilor",
+        "phone" : "2341657890",
+        "doctorId" : "507f1911110c19729de860ea"
+    },
+
+    "_doc_made_request": {
+        "_id": "507f1911110c19729de860ss",
+        "name":"George",
+        "role": "Doctor"
+    },
+
+    "_doc_added_to_patient": {
+        "_id": "507f1911110c19729de860ea",
+        "name":"Mihai",
+        "role": "Doctor"
+    },
+
+    "_assistant_added_to_patient" : {
+        "_id": "507f1671131c19729de860ea",
+        "name":"Ionel",
+        "role": "Assistant"
+    },
+
+    "request_data_assign_assistant": {
+        "assistants" : "507f1671131c19729de860ea"
+    },
+
+    "request_data_create_treatment": {
+        "name" : "Heart",
+        "description" : "description",
+        "medication" : ["heart pills", "heart controls"]
+    },
+
+    "patient_created" : {
+        "_id" : "641ede06c3f384bdc59f865f",
+        "name":"Gheorge"
+    },
+
+    "treatment_created" : {
+        "_id" : "641ee0564fbac6b24a25ae47",
+        "name" : "Heart"
+    },
+
+    "request_data_recommend_treatment" : {
+        "treatmentsRecommended" : "641ee0564fbac6b24a25ae47"
+    }
+
+
+
+
+}

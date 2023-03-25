@@ -31,3 +31,5 @@ app.options('*', cors())
 app.listen(port, console.log('Server is on port: ' + port));
 
 app.use('/api', router);
+
+module.exports = app;

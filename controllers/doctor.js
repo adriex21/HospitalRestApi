@@ -6,7 +6,8 @@ const controller = {
 
     createPatient : async(req, res) => {
 
-        const {name,gender,birthDate,adress,phone,doctorId } = req.body;
+        const {name, gender, birthDate, adress, phone, doctorId } = req.body;
+
         const drOrManager = await Employee.findById(req.employee._id);
         const doctor = await Employee.findById(doctorId);
 
@@ -54,7 +55,6 @@ const controller = {
 
                 }
             })
-
             
         }
     },
@@ -95,7 +95,6 @@ const controller = {
     }
 
     },
-
 
     assignAssistant: async(req,res) => {
 
@@ -222,7 +221,7 @@ const controller = {
                 const treatmentId = await Treatment.findById(req.body.treatmentsRecommended);
                 const patient = await Patient.findById(patientId);
 
-                console.log()
+    
 
                 if(!treatmentId){
                     return res.status(404).json({ message: 'Treatment not found.' });
@@ -293,7 +292,7 @@ const controller = {
                 }
 
               } catch(err) {
-                 res.status(500).send({msg: "Interal error"})
+                 res.status(500).send({msg: "Internal error"})
               }
             
         },

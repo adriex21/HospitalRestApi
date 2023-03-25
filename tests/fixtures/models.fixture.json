@@ -1,0 +1,21 @@
+{
+    
+    "employee" : {
+        "_id" : "507f191e810c19729de860ea",
+        "name": "Dr Georgel",
+        "email": "name@email.com"
+    },
+    "patient" : {
+        "_id" : "507f191e810c19729de860ea",
+        "name": "Pacientul 1",
+        "gender": "male",
+        "adress" : "alea livezilor"
+    },
+
+    "treatment" : {
+        "name" : "Heart treatment",
+        "description" : "A description"
+    }
+
+}
+

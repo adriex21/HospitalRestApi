@@ -1,8 +1,5 @@
 const Employee = require('../models/Employee');
-const Patient = require('../models/Patients');
-const Treatment = require('../models/Treatments')
 const jwt = require('jsonwebtoken')
-const passport = require('passport');
 const moment = require('moment')
 const bcrypt = require('bcryptjs');
 

@@ -8,12 +8,4 @@ router.post('/register', employee.register);
 router.post('/login', employee.login);
 
 
-
-
-
-
-
-
-
-
 module.exports = router;
