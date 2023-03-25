@@ -8,7 +8,7 @@ createDoctor: async(req, res) => {
     const manager = await Employee.findById(req.employee._id);
 
     if (manager.role !== 'General Manager') {
-        return res.status(200).send({msg : 'You are not a general manager'});
+        return res.status(400).send({msg : 'You are not a general manager'});
     }
 
     try {
@@ -45,11 +45,11 @@ updateEmployee: async (req, res) => {
     const manager = await Employee.findById(req.employee._id);
     
     if (manager.role !== 'General Manager') {
-        return res.status(200).send({msg : 'You are not a general manager'});
+        return res.status(400).send({msg : 'You are not a general manager'});
     }
 
     if(req.body.role) {
-        return res.status(200).send({msg : 'You cannot modify the role'});
+        return res.status(400).send({msg : 'You cannot modify the role'});
     }
 
     try {
@@ -82,7 +82,7 @@ createAssistant: async(req, res) => {
     const manager = await Employee.findById(req.employee._id);
 
     if (manager.role !== 'General Manager') {
-        return res.status(200).send({msg : 'You are not a general manager'});
+        return res.status(400).send({msg : 'You are not a general manager'});
     }
 
     try {
@@ -118,7 +118,7 @@ getDoctorsReport: async(req,res) => {
     const manager = await Employee.findById(req.employee._id);
 
     if (!['General Manager'].includes(manager?.role)) {
-        return res.status(200).send({msg : "You are not a general manager"});
+        return res.status(400).send({msg : "You are not a general manager"});
     }
 
     try {
@@ -151,7 +151,7 @@ getDoctor: async (req,res) => {
     const manager = await Employee.findById(req.employee._id);
 
     if(manager.role !== 'General Manager') {
-        res.status(404).send({msg: "You are not a general manager"});
+        res.status(400).send({msg: "You are not a general manager"});
     }
 
       try{
@@ -161,7 +161,7 @@ getDoctor: async (req,res) => {
         }
 
         if(doctor.role !== 'Doctor') {
-            res.status(404).send({msg: "Not a doctor"});
+            res.status(400).send({msg: "Not a doctor"});
         } 
         else{
             return res.status(200).send(doctor)
@@ -181,7 +181,7 @@ deleteDoctor: async (req,res) => {
     const manager = await Employee.findById(req.employee._id);
     
     if(manager.role !== 'General Manager') {
-        res.status(404).send({msg: "You are not a general manager"});
+        res.status(400).send({msg: "You are not a general manager"});
     }
 
     if(!doctor || doctor.role !== 'Doctor') {
@@ -216,7 +216,7 @@ getAssistant: async (req,res) => {
     const manager = await Employee.findById(req.employee._id);
 
     if(manager.role !== 'General Manager') {
-        res.status(404).send({msg: "You are not a general manager"});
+        res.status(400).send({msg: "You are not a general manager"});
     }
 
       try{
@@ -226,7 +226,7 @@ getAssistant: async (req,res) => {
         }
 
         if(assistant.role !== 'Assistant') {
-            res.status(404).send({msg: "Not an assistant"});
+            res.status(400).send({msg: "Not an assistant"});
         } 
         else{
             return res.status(200).send(assistant)
@@ -247,7 +247,7 @@ deleteAssistant: async(req,res) => {
     const drOrManager = await Employee.findById(req.employee._id);
     
     if (!['General Manager'].includes(drOrManager?.role)) {
-        return res.status(200).send({msg : "You are not a general manager"});
+        return res.status(400).send({msg : "You are not a general manager"});
     }
 
     try {

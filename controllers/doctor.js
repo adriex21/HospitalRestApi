@@ -66,7 +66,7 @@ const controller = {
         const patient = await Patient.findById(req.params.id) //search for the patient we making the request for
 
         if (!['General Manager', 'Doctor'].includes(drOrManager?.role) && !doctor._id.equals(patient._id)) {
-            return res.status(200).send({msg : "You are not a general manager or patient's doctor"});
+            return res.status(400).send({msg : "You are not a general manager or patient's doctor"});
         }
 
 
@@ -102,7 +102,7 @@ const controller = {
         const patient = await Patient.findById(req.params.id) 
 
         if (!['General Manager', 'Doctor'].includes(drOrManager?.role) && !patient.doctor.equals(req.employee._id)) {
-            return res.status(200).send({msg : "You are not a general manager or patient's doctor"});
+            return res.status(400).send({msg : "You are not a general manager or patient's doctor"});
         }
 
         try {
@@ -114,7 +114,7 @@ const controller = {
                 return res.status(404).json({ message: 'Assistant not found.' });
             }
             if(patient.assistants.includes(req.body.assistants)) {
-                return res.status(404).json({ message: 'Assistant already assigned' });
+                return res.status(400).json({ message: 'Assistant already assigned' });
             }
             
             patient.assistants.push(req.body.assistants);
@@ -213,7 +213,7 @@ const controller = {
             const patient = await Patient.findById(req.params.id) 
 
             if (!['Doctor'].includes(doctor?.role) && !patient.doctor.equals(req.employee._id)) {
-                return res.status(200).send({msg : "You are not the patient's doctor"});
+                return res.status(400).send({msg : "You are not the patient's doctor"});
             }
 
             try {
@@ -227,7 +227,7 @@ const controller = {
                     return res.status(404).json({ message: 'Treatment not found.' });
                 }
                 if(patient.treatmentsRecommended.some(obj => obj.id === req.body.treatmentsRecommended)) {
-                    return res.status(404).json({ message: 'Treatment already assigned' });
+                    return res.status(400).json({ message: 'Treatment already assigned' });
                 }
                 
                 const treatment = {id: req.body.treatmentsRecommended, applied:false, appliedBy:'None', recommendedBy : req.employee._id};
@@ -255,7 +255,7 @@ const controller = {
             const drOrManager = await Employee.findById(req.employee._id);
 
             if (!['General Manager', 'Doctor'].includes(drOrManager?.role)) {
-                return res.status(200).send({msg : "You are not a general manager or a doctor"});
+                return res.status(400).send({msg : "You are not a general manager or a doctor"});
             }
 
             try {
@@ -278,7 +278,7 @@ const controller = {
             const drOrManager = await Employee.findById(req.employee._id);
 
             if (!['General Manager', 'Doctor'].includes(drOrManager?.role)) {
-                res.status(404).send({msg: "You are not a general manager or patient's doctor"});
+                res.status(400).send({msg: "You are not a general manager or patient's doctor"});
             }
 
               try{
@@ -303,7 +303,7 @@ const controller = {
             const drOrManager = await Employee.findById(req.employee._id);
             
             if (!['General Manager', 'Doctor'].includes(drOrManager?.role)) {
-                return res.status(200).send({msg : "You are not a general manager or a doctor"});
+                return res.status(400).send({msg : "You are not a general manager or a doctor"});
             }
 
             try {
@@ -334,7 +334,7 @@ const controller = {
             const drOrManager = await Employee.findById(req.employee._id);
 
             if(!['General Manager', 'Doctor'].includes(drOrManager?.role)) {
-                res.status(404).send({msg: "You are not a general manager"});
+                res.status(400).send({msg: "You are not a general manager"});
             }
 
               try{
@@ -357,7 +357,7 @@ const controller = {
         const drOrManager = await Employee.findById(req.employee._id);
         
         if (!['General Manager', 'Doctor'].includes(drOrManager?.role)) {
-            return res.status(200).send({msg : "You are not a general manager or a doctor"});
+            return res.status(400).send({msg : "You are not a general manager or a doctor"});
         }
 
         try {

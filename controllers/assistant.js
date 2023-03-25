@@ -12,11 +12,11 @@ const controller = {
 
 
         if (!['Assistant'].includes(asssistant?.role)) {
-            return res.status(200).send({msg : "You are not an assistant"});
+            return res.status(400).send({msg : "You are not an assistant"});
         }
 
         if(!patient.assistants.includes(req.employee._id)) {
-            return res.status(200).send({msg:"You are not the patient's assistant"});  
+            return res.status(400).send({msg:"You are not the patient's assistant"});  
         }
 
 

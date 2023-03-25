@@ -20,7 +20,6 @@
     "nodemon": "^2.0.21",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
-    "sinon": "^15.0.2",
     "supertest": "^6.3.3"
   },
   "scripts": {
