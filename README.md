@@ -1,4 +1,4 @@
-# TremendHomework
+# Hospital Management Rest Api
 
 In order to install the necessary dependencies , they could be installed together by running the command npm i 
 
