@@ -13,7 +13,7 @@ const port = 3002
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
 
-mongoose.connect('mongodb+srv://admin:admin@cluster0.tbp6mtp.mongodb.net/?retryWrites=true&w=majority', {
+mongoose.connect('', {
   useNewUrlParser: true, 
   useUnifiedTopology: true
 });
